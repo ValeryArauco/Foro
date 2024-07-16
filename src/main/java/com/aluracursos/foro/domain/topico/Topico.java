@@ -3,10 +3,7 @@ package com.aluracursos.foro.domain.topico;
 import com.aluracursos.foro.domain.usuario.Usuario;
 import com.aluracursos.foro.domain.respuesta.Respuesta;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.EqualsAndHashCode;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import java.util.Date;
 import java.util.List;
@@ -14,6 +11,7 @@ import java.util.List;
 @Table(name = "topicos")
 @Entity(name = "Topico")
 @Getter
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode
@@ -53,10 +51,11 @@ public class Topico {
     }
 
 
-    public Topico(DatosRegistroTopico datosRegistroTopico) {
+    public Topico(DatosRegistroTopico datosRegistroTopico, Usuario autor) {
         this.titulo = datosRegistroTopico.titulo();
         this.mensaje = datosRegistroTopico.mensaje();
         this.curso = datosRegistroTopico.nombreCurso();
+        this.autor = autor;
     }
 
     public void actualizarDatos( DatosActualizarTopico datosActualizarTopico) {

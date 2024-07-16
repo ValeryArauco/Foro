@@ -1,6 +1,8 @@
 package com.aluracursos.foro.controller;
 
 import com.aluracursos.foro.domain.topico.*;
+import com.aluracursos.foro.domain.usuario.Usuario;
+import com.aluracursos.foro.domain.usuario.UsuarioRepository;
 import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Positive;
@@ -12,6 +14,7 @@ import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import java.net.URI;
@@ -23,15 +26,29 @@ public class TopicoController {
 
     @Autowired
     private TopicoRepository topicoRepository;
+    @Autowired
+    private UsuarioRepository usuarioRepository;
 
     @PostMapping
-    public ResponseEntity<DatosListadoTopico> registrarTopico(@RequestBody @Valid DatosRegistroTopico datosRegistroTopico, UriComponentsBuilder uriComponentsBuilder ){
-        Topico topico = topicoRepository.save(new Topico(datosRegistroTopico));
+    public ResponseEntity<DatosListadoTopico> registrarTopico(
+            @RequestBody @Valid DatosRegistroTopico datosRegistroTopico,
+            UriComponentsBuilder uriComponentsBuilder
+    ) {
+        Optional<Usuario> autorOptional = usuarioRepository.findById(datosRegistroTopico.idUsuario());
+        System.out.println(datosRegistroTopico.idUsuario());
+        System.out.println("-----------------------------");
+        if (!autorOptional.isPresent()) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Usuario no encontrado");
+        }
+        Usuario autor = autorOptional.get();
+
+        Topico topico = topicoRepository.save(new Topico(datosRegistroTopico, autor));
         DatosListadoTopico datosListadoTopico = new DatosListadoTopico(topico);
-        System.out.println(datosRegistroTopico);
-        URI url = uriComponentsBuilder.path("/medicos/{id}").buildAndExpand(topico.getId()).toUri();
+
+        URI url = uriComponentsBuilder.path("/topicos/{id}").buildAndExpand(topico.getId()).toUri();
         return ResponseEntity.created(url).body(datosListadoTopico);
     }
+
 
     @GetMapping
     public ResponseEntity<Page<DatosListadoTopico>> ListadoTopicos(@PageableDefault(size = 10)Pageable paginacion){

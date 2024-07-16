@@ -1,10 +1,11 @@
 package com.aluracursos.foro.domain.topico;
 
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 
 public record DatosRegistroTopico(
-        //@NotBlank
-        Integer idUsuario,
+        @NotNull
+        Long idUsuario,
         @NotBlank
         String mensaje,
         @NotBlank
