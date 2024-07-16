@@ -1,15 +1,12 @@
-package com.aluracursos.foro.topico;
+package com.aluracursos.foro.domain.topico;
 
-import com.aluracursos.foro.respuesta.Respuesta;
-import com.aluracursos.foro.usuario.DatosRegistroUsuario;
-import com.aluracursos.foro.usuario.Usuario;
+import com.aluracursos.foro.domain.usuario.Usuario;
+import com.aluracursos.foro.domain.respuesta.Respuesta;
 import jakarta.persistence.*;
-import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import org.springframework.web.bind.annotation.RequestBody;
 
 import java.util.Date;
 import java.util.List;
@@ -32,8 +29,8 @@ public class Topico {
     @Column(nullable = false, updatable = false, columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP")
     private Date fechaCreacion;
 
-    @Column(nullable = false, columnDefinition = "VARCHAR(255) DEFAULT 'pendiente'")
-    private String status = "pendiente";
+    @Column(nullable = false, columnDefinition = "VARCHAR(255) DEFAULT 'activo'")
+    private String status = "activo";
 
     @ManyToOne
     @JoinColumn(name = "autor_id")
@@ -51,7 +48,7 @@ public class Topico {
             fechaCreacion = new Date();
         }
         if (status == null) {
-            status = "pendiente";
+            status = "activo";
         }
     }
 

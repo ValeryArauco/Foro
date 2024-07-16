@@ -1,6 +1,5 @@
-package com.aluracursos.foro.topico;
+package com.aluracursos.foro.domain.topico;
 
-import jakarta.validation.constraints.NotBlank;
 import java.util.Date;
 
 public record DatosListadoTopico(

@@ -1,14 +1,20 @@
 package com.aluracursos.foro.controller;
 
-import com.aluracursos.foro.topico.*;
+import com.aluracursos.foro.domain.topico.*;
 import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Positive;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import java.util.List;
+import org.springframework.web.util.UriComponentsBuilder;
+
+import java.net.URI;
 import java.util.Optional;
 
 @RestController
@@ -19,47 +25,41 @@ public class TopicoController {
     private TopicoRepository topicoRepository;
 
     @PostMapping
-    public void registrarTopico(@RequestBody @Valid DatosRegistroTopico datosRegistroTopico){
-        topicoRepository.save(new Topico(datosRegistroTopico));
+    public ResponseEntity<DatosListadoTopico> registrarTopico(@RequestBody @Valid DatosRegistroTopico datosRegistroTopico, UriComponentsBuilder uriComponentsBuilder ){
+        Topico topico = topicoRepository.save(new Topico(datosRegistroTopico));
+        DatosListadoTopico datosListadoTopico = new DatosListadoTopico(topico);
         System.out.println(datosRegistroTopico);
+        URI url = uriComponentsBuilder.path("/medicos/{id}").buildAndExpand(topico.getId()).toUri();
+        return ResponseEntity.created(url).body(datosListadoTopico);
     }
 
     @GetMapping
-    public List<DatosListadoTopico> ListadoTopicos(){
-        return topicoRepository.findAll().stream().map(DatosListadoTopico::new).toList();
+    public ResponseEntity<Page<DatosListadoTopico>> ListadoTopicos(@PageableDefault(size = 10)Pageable paginacion){
+        return ResponseEntity.ok(topicoRepository.findAll(paginacion).map(DatosListadoTopico::new));
     }
 
     @GetMapping("/{id}")
-    public DatosListadoTopico obtenerTopicoPorId(@PathVariable("id") @Positive Long id) {
+    public ResponseEntity<DatosListadoTopico> obtenerTopicoPorId(@PathVariable("id") @Positive Long id) {
         Optional<Topico> topicoOptional = topicoRepository.findById(id);
-        if (topicoOptional.isPresent()) {
-            return new DatosListadoTopico(topicoOptional.get());
-        } else {
-            String mensaje = "Tópico con id " + id + " no encontrado";
-            System.out.println(mensaje);
-            /* return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null); */
-        }
-        return null;
+        var datosTopico = new DatosListadoTopico(topicoOptional.get());
+        return ResponseEntity.ok(datosTopico);
     }
 
 
     @PutMapping
     @Transactional
-    public void actualizarTopico(@RequestBody @Valid DatosActualizarTopico datosActualizarTopico){
-        Topico topico = topicoRepository.getReferenceById(datosActualizarTopico.id());
-        topico.actualizarDatos(datosActualizarTopico);
+    public ResponseEntity actualizarTopico(@RequestBody @Valid DatosActualizarTopico datosActualizarTopico){
+        Optional<Topico> topico = Optional.of(topicoRepository.getReferenceById(datosActualizarTopico.id()));
+        topico.get().actualizarDatos(datosActualizarTopico);
+        return ResponseEntity.ok(datosActualizarTopico);
     }
 
     @DeleteMapping("/{id}")
     @Transactional
-    public void eliminarTopico(@PathVariable("id") @Positive Long id){
+    public ResponseEntity eliminarTopico(@PathVariable("id") @Positive Long id){
         Optional<Topico> topicoOptional = topicoRepository.findById(id);
-        if (topicoOptional.isPresent()) {
-            topicoRepository.deleteById(id);
-        } else {
-            String mensaje = "Tópico con id " + id + " no encontrado";
-            System.out.println(mensaje);
-            /* return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null); */
-        }
+        topicoRepository.deleteById(id);
+        return ResponseEntity.noContent().build();
+
     }
 }

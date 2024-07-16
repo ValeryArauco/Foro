@@ -1,10 +1,8 @@
 package com.aluracursos.foro.controller;
 
-import com.aluracursos.foro.topico.DatosRegistroTopico;
-import com.aluracursos.foro.topico.Topico;
-import com.aluracursos.foro.usuario.DatosRegistroUsuario;
-import com.aluracursos.foro.usuario.Usuario;
-import com.aluracursos.foro.usuario.UsuarioRepository;
+import com.aluracursos.foro.domain.usuario.DatosRegistroUsuario;
+import com.aluracursos.foro.domain.usuario.Usuario;
+import com.aluracursos.foro.domain.usuario.UsuarioRepository;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PostMapping;
